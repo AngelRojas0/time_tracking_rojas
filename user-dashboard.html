@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="style.css"> 
     <script src="timer-logic.js"></script>
     <script>
-        // RUN THIS IMMEDIATELY to prevent the "white flash"
         (function() {
             const savedTheme = localStorage.getItem("theme");
             if (savedTheme === "dark") {
@@ -27,7 +26,6 @@
             <button class="nav-btn active" onclick="location.href='user-dashboard.html'">Dashboard</button>
             <button class="nav-btn" onclick="location.href='user-logs.html'">Time Logs</button>
             <button class="nav-btn" onclick="location.href='user-reports.html'">Reports</button>
-            <!-- Pointing to your specific user-settings file -->
             <button class="nav-btn" onclick="location.href='user-settings.html'">Settings</button>
         </nav>
         <button class="logout-btn" onclick="logout()">Logout</button>
@@ -41,70 +39,78 @@
             <div class="dashboard-card">
                 <h3>Real-Time Tracker</h3>
                 <p>Track your active work session.</p>
-                <div id="timer" class="timer-display">00:00:00</div>
+
+                            <div style="margin: 15px 0;">
+                <label for="taskSelect" style="display: block; margin-bottom: 5px; font-size: 0.9rem; opacity: 0.8;">Select Current Task:</label>
+                <select id="taskSelect" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; background: #1a1a1a; color: white;">
+                    <option value="">-- Choose a Task --</option>
+                    <option value="1">Frontend Development</option>
+                    <option value="2">Backend API Integration</option>
+                    <option value="3">Database Optimization</option>
+                    <option value="4">Bug Fixing & Debugging</option>
+                    <option value="5">System Documentation</option>
+                    <option value="6">UI/UX Design Refinement</option>
+                    <option value="7">Unit Testing</option>
+                </select>
+            </div>
+
+                <div id="timer" class="timer-display" style="font-size: 3rem; font-weight: bold; margin: 20px 0;">00:00:00</div>
+                
                 <div class="timer-actions">
-                    <button onclick="startTimer()" class="primary-btn">Start</button>
-                    <button onclick="stopTimer()" class="secondary-btn">Stop</button>
+                    <button id="startBtn" onclick="startTimer()" class="primary-btn">Start</button>
+                    <button id="stopBtn" onclick="stopTimer()" class="secondary-btn" disabled>Stop</button>
                 </div>
             </div>
 
             <div class="dashboard-card">
                 <h3>Today's Summary</h3>
                 <p>Total time tracked today:</p>
-                <div id="total" class="timer-display">00:00:00</div>
+                <div id="total" class="timer-display" style="font-size: 3rem; font-weight: bold; margin: 20px 0;">00:00:00</div>
             </div>
         </div>
     </main>
-
 </div>
 
 <script>
-    // THEME CHECK: Runs immediately when page loads
-    window.addEventListener('DOMContentLoaded', (event) => {
-    const savedTheme = localStorage.getItem("theme");
-    // This adds the class when the page loads based on your choice in settings
-    if (savedTheme === "dark") {
-        document.body.classList.add("dark-mode");
-    }
-});
-
     window.addEventListener('DOMContentLoaded', () => {
-    // 1. Theme Check
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-        document.documentElement.classList.add("dark-mode");
+        loadTasks(); 
+        loadUserInfo(); 
+    });
+
+    function loadUserInfo() {
+        fetch('get_user_info.php')
+            .then(res => res.json())
+            .then(data => {
+                if (!data.error) {
+                    document.getElementById('userDisplayName').textContent = data.username;
+                }
+            })
+            .catch(err => console.error("Failed to fetch user data:", err));
     }
 
-    // 2. Fetch Personal User Info
-    fetch('get_user_info.php')
-        .then(res => {
-            if (!res.ok) throw new Error("Network response was not ok");
-            return res.json();
-        })
-        .then(data => {
-            if (data.error) {
-                console.error("Session Error:", data.error);
-                // Optional: redirect to login if session expired
-                // window.location.href = 'index.html'; 
-            } else {
-                // Map the PHP response to your HTML IDs
-                document.getElementById('userDisplayName').textContent = data.username;
-                document.getElementById('userDisplayEmail').textContent = data.email;
-            }
-        })
-        .catch(err => {
-            console.error("Failed to fetch user data:", err);
-            document.getElementById('userDisplayName').textContent = "User";
-        });
-});
+    function loadTasks() {
+        fetch('get_tasks.php')
+            .then(res => res.json())
+            .then(tasks => {
+                const select = document.getElementById("taskSelect");
+                // Reset dropdown
+                select.innerHTML = '<option value="">-- Choose a Task --</option>';
+                
+                tasks.forEach(task => {
+                    let option = document.createElement("option");
+                    option.value = task.task_id;
+                    option.textContent = task.task_name;
+                    select.appendChild(option);
+                });
+            })
+            .catch(err => console.error("Error loading tasks:", err));
+    }
 
     function logout() {
-        // Keeps theme choice but clears session data
         sessionStorage.clear();
         window.location.href = "index.html";
     }
 
-    // TIMER LOGIC
     let startTime;
     let elapsedTime = 0;
     let timerInterval;
@@ -120,6 +126,15 @@
     }
 
     function startTimer() {
+        const taskId = document.getElementById("taskSelect").value;
+        if (!taskId) {
+            alert("Please select a task before starting!");
+            return;
+        }
+        document.getElementById("startBtn").disabled = true;
+        document.getElementById("stopBtn").disabled = false;
+        document.getElementById("taskSelect").disabled = true;
+
         startTime = Date.now() - elapsedTime;
         timerInterval = setInterval(function printTime() {
             elapsedTime = Date.now() - startTime;
@@ -129,8 +144,10 @@
 
     function stopTimer() {
         clearInterval(timerInterval);
+        document.getElementById("startBtn").disabled = false;
+        document.getElementById("stopBtn").disabled = true;
+        document.getElementById("taskSelect").disabled = false;
     }
 </script>
-
 </body>
 </html>
