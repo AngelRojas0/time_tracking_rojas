@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reports | Time Tracker</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+        // RUN THIS IMMEDIATELY to prevent the "white flash"
+        (function() {
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme === "dark") {
+                document.documentElement.classList.add("dark-mode");
+                document.body.classList.add("dark-mode");
+            }
+        })();
+    </script>
+</head>
+<body>
+<div class="dashboard-page" style="display: flex; min-height: 100vh;">
+  <aside class="dashboard-sidebar">
+    <h2>⏱ Time Tracker</h2>
+    <nav>
+      <button class="nav-btn" onclick="location.href='user-dashboard.html'">Dashboard</button>
+      <button class="nav-btn" onclick="location.href='user-logs.html'">Time Logs</button>
+      <button class="nav-btn active" onclick="location.href='user-reports.html'">Reports</button>
+      <button class="nav-btn" onclick="location.href='user-settings.html'">Settings</button>
+    </nav>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </aside>
+
+  <!-- REMOVED background: #f4f7f6; so the dark-mode CSS can take over -->
+  <main class="dashboard-main" style="flex: 1; padding: 40px;">
+    <h1>Reports & Analytics</h1>
+    
+    <!-- REMOVED background: white; so the card turns dark too -->
+    <div class="dashboard-card" style="padding: 30px; border-radius: 12px; width: 100%; max-width: 600px;">
+      <h3>Productivity Summary</h3>
+      <p>Total Accumulative Work Time:</p>
+      <div id="reportTotal" class="report-timer" style="font-size: 3.5rem; font-weight: bold; color: #3498db; margin: 20px 0;">00:00:00</div>
+      <p class="report-subtext">This is the sum of all your recorded logs.</p>
+    </div>
+  </main>
+</div>
+
+<script>
+  // This script runs as soon as the page loads to check your theme preference
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+        document.body.classList.add("dark-mode");
+    }
+  });
+
+  function logout() {
+    sessionStorage.clear();
+    window.location.href = "index.html";
+  }
+</script>
+<script src="timer-logic.js"></script>
+</body>
+</html>

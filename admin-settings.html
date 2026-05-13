@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Settings | Time Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="dashboard-page" style="display: flex; min-height: 100vh;">
+
+    <!-- Admin Sidebar -->
+    <aside class="dashboard-sidebar">
+        <h2>⏱ Admin Panel</h2>
+        <nav>
+            <button class="nav-btn" onclick="location.href='admin-dashboard.html'">Dashboard</button>
+            <button class="nav-btn" onclick="location.href='admin-logs.html'">All Logs</button>
+            <button class="nav-btn" onclick="location.href='admin-reports.html'">System Reports</button>
+            <button class="nav-btn active" onclick="location.href='admin-settings.html'">Settings</button>
+        </nav>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main" style="flex: 1; padding: 40px;">
+        <h1>Settings</h1>
+        <p class="subtitle">Manage system display preferences.</p>
+
+        <div class="dashboard-cards">
+            <!-- Appearance Card -->
+            <div class="dashboard-card" style="width: 100%; max-width: 500px;">
+                <h3>Appearance</h3>
+                <p>Switch between Light and Dark mode for the admin panel.</p>
+                
+                <!-- Perfectly Aligned Toggle Wrapper -->
+                <div class="theme-switch-wrapper" style="display: flex; align-items: center; gap: 15px; margin-top: 20px;">
+                    <label class="theme-switch" for="themeToggle">
+                        <input type="checkbox" id="themeToggle" onclick="toggleTheme()" />
+                        <div class="slider round"></div>
+                    </label>
+                    <span id="themeLabel" style="font-weight: bold; font-size: 16px;">Light Mode</span>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // THEME TOGGLE LOGIC
+    function toggleTheme() {
+        const isDark = document.getElementById("themeToggle").checked;
+        const label = document.getElementById("themeLabel");
+        
+        if (isDark) {
+            document.documentElement.classList.add("dark-mode");
+            document.body.classList.add("dark-mode");
+            localStorage.setItem("theme", "dark");
+            label.textContent = "Dark Mode";
+        } else {
+            document.documentElement.classList.remove("dark-mode");
+            document.body.classList.remove("dark-mode");
+            localStorage.setItem("theme", "light");
+            label.textContent = "Light Mode";
+        }
+    }
+
+    // SYNC THEME & TOGGLE STATE ON LOAD
+    window.addEventListener('DOMContentLoaded', (event) => {
+        const savedTheme = localStorage.getItem("theme");
+        const themeToggle = document.getElementById("themeToggle");
+        const themeLabel = document.getElementById("themeLabel");
+
+        if (savedTheme === "dark") {
+            document.documentElement.classList.add("dark-mode");
+            document.body.classList.add("dark-mode");
+            if (themeToggle) themeToggle.checked = true;
+            if (themeLabel) themeLabel.textContent = "Dark Mode";
+        } else {
+            if (themeToggle) themeToggle.checked = false;
+            if (themeLabel) themeLabel.textContent = "Light Mode";
+        }
+    });
+
+    function logout() {
+        sessionStorage.clear();
+        window.location.href = "index.html";
+    }
+</script>
+
+</body>
+</html>

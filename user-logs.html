@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time Logs | Time Tracker</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+        (function() {
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme === "dark") {
+                document.documentElement.classList.add("dark-mode");
+            }
+        })();
+    </script>
+</head>
+<body>
+
+<div class="dashboard-page" style="display: flex; min-height: 100vh;">
+  
+  <aside class="dashboard-sidebar">
+    <h2>⏱ Time Tracker</h2>
+    <nav>
+      <button class="nav-btn" onclick="location.href='user-dashboard.html'">Dashboard</button>
+      <button class="nav-btn active" onclick="location.href='user-logs.html'">Time Logs</button>
+      <button class="nav-btn" onclick="location.href='user-reports.html'">Reports</button>
+      <button class="nav-btn" onclick="location.href='user-settings.html'">Settings</button>
+    </nav>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </aside>
+ 
+  <main class="dashboard-main" style="flex: 1; padding: 40px;">
+    
+    <!-- LEVELLED HEADER: Title and Button on the same line -->
+    <div style="display: flex; justify-content: space-between; align-items: center; max-width: 600px; width: 100%; margin-bottom: 5px;">
+        <h1 style="margin: 0;">Time Logs</h1>
+        
+        <button onclick="printLogs()" class="secondary-btn" 
+            style="background: #10b981; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; font-size: 14px;">
+            📄 Download PDF
+        </button>
+    </div>
+    
+    <p class="subtitle" style="margin: 0 0 25px 0;">Your recorded work sessions</p>
+
+    <div class="dashboard-card" style="max-width: 600px;">
+      <table id="logsTable" style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr class="table-header-row" style="text-align: left;">
+            <th style="padding: 12px;">Date</th>
+            <th style="padding: 12px;">Duration</th>
+            <th style="padding: 12px;">Status</th>
+          </tr>
+        </thead>
+        <tbody id="logsBody"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+        document.body.classList.add("dark-mode");
+    }
+  });
+
+  function printLogs() {
+    const originalTitle = document.title;
+    document.title = "My_Time_Logs_" + new Date().toISOString().split('T')[0];
+    window.print();
+    document.title = originalTitle;
+  }
+
+  function logout() {
+    sessionStorage.clear();
+    window.location.href = "index.html";
+  }
+</script>
+<script src="timer-logic.js"></script>
+</body>
+</html>

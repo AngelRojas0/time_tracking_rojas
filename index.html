@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Time Tracker | Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="auth-page">
+  <div class="auth-container">
+    <div class="auth-side">
+      <div class="side-content">
+        <div class="clock-icon">⏱</div>
+        <h2>Time Tracking System</h2>
+        <p>Track work hours in real‑time, improve productivity, and analyze time usage efficiently.</p>
+      </div>
+    </div>
+
+    <div class="auth-card">
+      <h1>Welcome</h1>
+      <p id="subtitle">Sign in to start tracking your time</p>
+
+      <form id="loginForm">
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="loginUser" required>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="loginPass" required>
+        </div>
+        <button class="primary-btn" type="submit">Login</button>
+        <p class="switch-text">New user? <button type="button" id="toRegister" class="link-btn">Create an account</button></p>
+      </form>
+
+      <form id="registerForm" class="hidden">
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="regEmail" required>
+        </div>
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="regUser" required>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="regPass" required>
+        </div>
+        <div class="field">
+          <label>Secret Admin Key (Optional)</label>
+          <input type="password" id="adminKey" placeholder="Leave blank for regular user">
+        </div>
+        <button class="primary-btn" type="submit">Create Account</button>
+        <p class="switch-text">Already have an account? <button type="button" id="toLogin" class="link-btn">Login</button></p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const loginForm = document.getElementById("loginForm");
+  const registerForm = document.getElementById("registerForm");
+  const subtitle = document.getElementById("subtitle");
+
+  document.getElementById("toRegister").onclick = () => {
+    loginForm.classList.add("hidden");
+    registerForm.classList.remove("hidden");
+    subtitle.textContent = "Create a new account to start tracking";
+  };
+
+  document.getElementById("toLogin").onclick = () => {
+    registerForm.classList.add("hidden");
+    loginForm.classList.remove("hidden");
+    subtitle.textContent = "Sign in to start tracking your time";
+  };
+
+  // REGISTER LOGIC
+  registerForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const data = {
+      email: document.getElementById("regEmail").value,
+      username: document.getElementById("regUser").value,
+      password: document.getElementById("regPass").value,
+      secret_key: document.getElementById("adminKey").value
+    };
+
+    fetch("register.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(result => {
+      if (result.status === "success") {
+        alert("✅ Account created!");
+        location.reload();
+      } else {
+        alert("❌ Registration failed: " + result.message);
+      }
+    })
+    .catch(err => alert("❌ Connection failed. Check if Apache is running in XAMPP."));
+  });
+
+  // LOGIN LOGIC
+  loginForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const data = {
+      username: document.getElementById("loginUser").value,
+      password: document.getElementById("loginPass").value
+    };
+
+    fetch("login.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(result => {
+      if (result.status === "success") {
+        window.location.href = (result.role_id == 1) ? "admin-dashboard.html" : "user-dashboard.html";
+      } else {
+        alert("❌ Invalid credentials.");
+      }
+    })
+    .catch(err => alert("❌ Connection failed. Ensure you are using http://localhost/"));
+  });
+</script>
+</body>
+</html>

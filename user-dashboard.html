@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard | Time Tracker</title>
+    <link rel="stylesheet" href="style.css"> 
+    <script src="timer-logic.js"></script>
+    <script>
+        // RUN THIS IMMEDIATELY to prevent the "white flash"
+        (function() {
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme === "dark") {
+                document.documentElement.classList.add("dark-mode");
+                document.body.classList.add("dark-mode");
+            }
+        })();
+    </script>
+</head>
+<body>
+
+<div class="dashboard-page" style="display: flex; width: 100%; min-height: 100vh;">
+
+    <aside class="dashboard-sidebar">
+        <h2>⏱ Time Tracker</h2>
+        <nav>
+            <button class="nav-btn active" onclick="location.href='user-dashboard.html'">Dashboard</button>
+            <button class="nav-btn" onclick="location.href='user-logs.html'">Time Logs</button>
+            <button class="nav-btn" onclick="location.href='user-reports.html'">Reports</button>
+            <!-- Pointing to your specific user-settings file -->
+            <button class="nav-btn" onclick="location.href='user-settings.html'">Settings</button>
+        </nav>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </aside>
+
+    <main class="dashboard-main" style="flex: 1; padding: 20px;">
+        <h1>Welcome Back, <span id="userDisplayName">...</span>!</h1>
+        <p class="subtitle">Track your work time and stay productive.</p>
+        
+        <div class="dashboard-cards">
+            <div class="dashboard-card">
+                <h3>Real-Time Tracker</h3>
+                <p>Track your active work session.</p>
+                <div id="timer" class="timer-display">00:00:00</div>
+                <div class="timer-actions">
+                    <button onclick="startTimer()" class="primary-btn">Start</button>
+                    <button onclick="stopTimer()" class="secondary-btn">Stop</button>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>Today's Summary</h3>
+                <p>Total time tracked today:</p>
+                <div id="total" class="timer-display">00:00:00</div>
+            </div>
+        </div>
+    </main>
+
+</div>
+
+<script>
+    // THEME CHECK: Runs immediately when page loads
+    window.addEventListener('DOMContentLoaded', (event) => {
+    const savedTheme = localStorage.getItem("theme");
+    // This adds the class when the page loads based on your choice in settings
+    if (savedTheme === "dark") {
+        document.body.classList.add("dark-mode");
+    }
+});
+
+    window.addEventListener('DOMContentLoaded', () => {
+    // 1. Theme Check
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark-mode");
+    }
+
+    // 2. Fetch Personal User Info
+    fetch('get_user_info.php')
+        .then(res => {
+            if (!res.ok) throw new Error("Network response was not ok");
+            return res.json();
+        })
+        .then(data => {
+            if (data.error) {
+                console.error("Session Error:", data.error);
+                // Optional: redirect to login if session expired
+                // window.location.href = 'index.html'; 
+            } else {
+                // Map the PHP response to your HTML IDs
+                document.getElementById('userDisplayName').textContent = data.username;
+                document.getElementById('userDisplayEmail').textContent = data.email;
+            }
+        })
+        .catch(err => {
+            console.error("Failed to fetch user data:", err);
+            document.getElementById('userDisplayName').textContent = "User";
+        });
+});
+
+    function logout() {
+        // Keeps theme choice but clears session data
+        sessionStorage.clear();
+        window.location.href = "index.html";
+    }
+
+    // TIMER LOGIC
+    let startTime;
+    let elapsedTime = 0;
+    let timerInterval;
+
+    function timeToString(time) {
+        let diffInHrs = time / 3600000;
+        let hh = Math.floor(diffInHrs);
+        let diffInMin = (diffInHrs - hh) * 60;
+        let mm = Math.floor(diffInMin);
+        let diffInSec = (diffInMin - mm) * 60;
+        let ss = Math.floor(diffInSec);
+        return `${hh.toString().padStart(2, "0")}:${mm.toString().padStart(2, "0")}:${ss.toString().padStart(2, "0")}`;
+    }
+
+    function startTimer() {
+        startTime = Date.now() - elapsedTime;
+        timerInterval = setInterval(function printTime() {
+            elapsedTime = Date.now() - startTime;
+            document.getElementById("timer").innerHTML = timeToString(elapsedTime);
+        }, 1000);
+    }
+
+    function stopTimer() {
+        clearInterval(timerInterval);
+    }
+</script>
+
+</body>
+</html>
